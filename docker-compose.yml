@@ -1,0 +1,50 @@
+version: "3.7"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    container_name: elasticsearch
+    restart: always
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data/
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      discovery.type: single-node
+    networks:
+      - es-net
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:7.11.0
+    restart: always
+    volumes:
+      - ./config-dir/logstash.conf:/etc/logstash/config.d
+    command: logstash -f /config-dir/logstash.conf
+    ports:
+      - 5044:5044
+    environment:
+      LS_JAVA_OPTS: -Xmx256m -Xms256m
+    networks:
+      - es-net
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.11.0
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - es-net
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+
+volumes:
+  elastic_data: { }
+
+networks:
+  es-net:
+    driver: bridge

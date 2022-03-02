@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: elasticSearchDemo
+
+server:
+  port: 9898
+
+logging:
+  file:
+    name: /Users/oneday/Documents/elasticSearchDemo/src/main/java/com/test/elasticsearchdemo/elk-stack.log
